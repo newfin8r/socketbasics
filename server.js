@@ -13,13 +13,6 @@ io.on('connection', function(socket) { //on lets you liste to events. The first 
 
     });
 
-    socket.on('message2', function(message) { //listens to a message event
-        console.log('Message from client :' + message.text);
-        socket.broadcast.emit('message2', message); //broadcast.emit send data to every socket except the one that originally sent it instead of every socket INCLUDING the originator
-
-    });
-
-
     socket.emit('message', { //access to the socket and pass data back. The first param is the event name, the second is the data being passed back. Using an object as the data allows you to store more.
         text: "Welcome to the app"
     });
