@@ -16,6 +16,7 @@ io.on('connection', function(socket) { //on lets you liste to events. The first 
     });
 
     socket.emit('message', { //access to the socket and pass data back. The first param is the event name, the second is the data being passed back. Using an object as the data allows you to store more.
+        name: 'system',
         timestamp: moment().valueOf(), //add a timestamp property to the message and set  it as the value of so that it is a number,
         text: "Welcome to the app"
     });
@@ -26,4 +27,3 @@ app.use(express.static(__dirname + '/public'));
 http.listen(PORT, function() {
     console.log('server started');
 });
-4
