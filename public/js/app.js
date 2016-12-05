@@ -3,6 +3,7 @@ socket.on('connect', function() {
     console.log('Client connected to socket.io server');
 });
 socket.on('message', function(message) { //creates a listener for a custom event called in server.js
+    jQuery('.messages').append('<p>' + message.text + '</p>');
     console.log('message recieved:' + message.text);
 });
 socket.emit('message2', { //access to the socket and pass data back. The first param is the event name, the second is the data being passed back. Using an object as the data allows you to store more.
