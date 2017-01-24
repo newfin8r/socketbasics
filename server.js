@@ -34,6 +34,20 @@ io.on('connection', function(socket) { //on lets you liste to events. The first 
         timestamp: moment().valueOf(), //add a timestamp property to the message and set  it as the value of so that it is a number,
         text: "Welcome to the app"
     });
+
+    socket.on('disconnect', function() { //disconnect is a built in event
+        var userData = clientInfo[socket.id];
+        if (typeof(userData) != 'undefined') { //see if user did something
+            socket.leave(userData.room); //disconnects from room
+            io.to(userData.room).emit('message', {
+                name: 'System',
+                text: userData.name +
+                    ' has left the room',
+                timestamp: moment().valueOf()
+            });
+            delete clientInfo[socket.id]; //delete lets us delete an atribute from an object
+        }
+    });
 });
 
 app.use(express.static(__dirname + '/public'));
