@@ -1,9 +1,18 @@
 var socket = io(); //requires the socket.io file be loaded in the main HTML file first and creates a socket object and connects to the internal server
+
+var name = getQueryParam('name') || 'Anonymous';
+var room = getQueryParam('room') || 'No Room';
+var $room = jQuery('.room-title');
+$room.text(room); //or just jQuery('.room-title').text(room);
+
 socket.on('connect', function() {
     console.log('Client connected to socket.io server');
+    socket.emit('joinRoom', {
+        name: name,
+        room: room
+    }); //joinRoom is a custom event
 });
-var name = getQueryParam('name') || 'Anonymous';
-var room = getQueryParam('room');
+
 console.log('name: ' + name + ' room: ' + room);
 
 socket.on('message', function(message) { //creates a listener for a custom event called in server.js
