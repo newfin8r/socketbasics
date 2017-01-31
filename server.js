@@ -7,6 +7,47 @@ var moment = require('moment');
 
 var clientInfo = {}; //meant as a means(model for) of storing user session data
 
+//sned current usrs to provided socket
+function sendCurrentUsers(socket) {
+    var info = clientInfo[socket.id];
+    var users = [];
+
+    if (typeof(info) === 'undefined') {
+        return;
+    }
+
+    Object.keys(clientInfo).forEach(function(socketId) { //Object.keys returns an array og object properties/attributes
+        var userinfo = clientInfo[socketId];
+        if (info.room === userinfo.room) {
+            users.push(userinfo.name);
+        }
+    });
+
+    socket.emit('message', {
+        name: 'System',
+        text: 'Current users: ' + users.join(', '),
+        timestamp: moment().valueOf()
+    });
+}
+// function sendPrivateMessage(socket, toUser, message) {
+//     var info = clientInfo[socket.id];
+//
+//     if (typeof(info) === 'undefined') {
+//         return;
+//     }
+//
+//     Object.keys(clientInfo).forEach(function(socketId) { //Object.keys returns an array og object properties/attributes
+//         var userinfo = clientInfo[socketId];
+//         if (userinfo.name === toUser) {
+//             socket.emit('message', {
+//                 name: 'System',
+//                 text: 'Current users: ' + users.join(', '),
+//                 timestamp: moment().valueOf()
+//             });
+//         }
+//     });
+// }
+
 io.on('connection', function(socket) { //on lets you liste to events. The first param is the name of the event and the second is the function to fire during that event. You get access to the individual socket connection
     console.log('user connected via socket.io'); //writes when a user connects
 
@@ -21,12 +62,24 @@ io.on('connection', function(socket) { //on lets you liste to events. The first 
     });
 
     socket.on('message', function(message) { //listens to a message event
-        message.timestamp = moment().valueOf(); //add a timestamp property to the message and set  it as the value of so that it is a number
         console.log('Message :' + message.timestamp + message.text);
-        //socket.broadcast.emit('message', message); //broadcast.emit send data to every socket except the one that originally sent it instead of every socket INCLUDING the originator
-        //io.emit('message', message); //sends the message to all connected users
-        io.to(clientInfo[socket.id].room).emit('message',
-            message); //changed from above to target user room
+        if (message.text === '@currentUsers') {
+            sendCurrentUsers(socket);
+        }
+        // else if (message.text.indexOf('@private')!=-1) {
+        //     var toUser;
+        //     var privateMessage;
+        //
+        //     sendPrivateMessage(socket, toUser, privateMessage);
+        // }
+        else {
+            message.timestamp = moment().valueOf(); //add a timestamp property to the message and set  it as the value of so that it is a number
+            //socket.broadcast.emit('message', message); //broadcast.emit send data to every socket except the one that originally sent it instead of every socket INCLUDING the originator
+            //io.emit('message', message); //sends the message to all connected users
+            io.to(clientInfo[socket.id].room).emit('message',
+                message); //changed from above to target user room
+        }
+
     });
 
     socket.emit('message', { //access to the socket and pass data back. The first param is the event name, the second is the data being passed back. Using an object as the data allows you to store more.
