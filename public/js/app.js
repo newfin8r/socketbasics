@@ -17,11 +17,13 @@ console.log('name: ' + name + ' room: ' + room);
 
 socket.on('message', function(message) { //creates a listener for a custom event called in server.js
     var momentTimeStamp = moment.utc(message.timestamp);
-    var $message = jQuery('.messages');
+    var $messages = jQuery('.messages'); //message div on chat.html
+    var $message = jQuery('<li class=list-group-item></li>'); //individual message
 
     $message.append('<p><strong>' + message.name + ' ' +
         momentTimeStamp.local().format('h:mm a') + '</strong></p>');
     $message.append('<p>' + message.text + '</p>');
+    $messages.append($message);
 
     console.log('message recieved:' + $message.html());
 });
